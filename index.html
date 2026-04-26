@@ -593,63 +593,6 @@ body {
   width: 100%;
   margin-top: 8px;
 }
-
-/* Estilos do Cronômetro Flutuante */
-.stopwatch-widget {
-  position: fixed;
-  bottom: 80px;
-  right: 16px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 30px;
-  padding: 8px 12px 8px 16px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  z-index: 40;
-  transition: transform 0.2s;
-}
-
-.sw-time {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--gray-900);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.5px;
-}
-
-.sw-controls {
-  display: flex;
-  gap: 6px;
-}
-
-.sw-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.15s;
-}
-
-.sw-btn.play {
-  background: var(--green-100);
-  color: var(--green-900);
-}
-
-.sw-btn.play:active { background: var(--green-400); color: white; }
-
-.sw-btn.reset {
-  background: var(--gray-100);
-  color: var(--gray-700);
-}
-
-.sw-btn.reset:active { background: var(--gray-200); }
 </style>
 </head>
 <body>
@@ -747,14 +690,6 @@ body {
 
 </div>
 
-<div class="stopwatch-widget">
-  <div class="sw-time" id="sw-time">00:00</div>
-  <div class="sw-controls">
-    <button class="sw-btn play" id="sw-play" onclick="toggleStopwatch()">▶</button>
-    <button class="sw-btn reset" onclick="resetStopwatch()">◼</button>
-  </div>
-</div>
-
 <div class="tabs-bottom">
   <button class="tab-bottom active" onclick="switchView('today', this)">
     <span class="tab-icon">●</span>
@@ -813,4 +748,501 @@ const SVG_FIGURES = {
 
   alongamento: `<svg viewBox="0 0 280 180" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="160" x2="270" y2="160" stroke="#888" stroke-width="2"/><circle cx="50" cy="135" r="11" fill="#1D9E75"/><line x1="60" y1="135" x2="120" y2="135" stroke="#1D9E75" stroke-width="5" stroke-linecap="round"/><line x1="120" y1="135" x2="180" y2="65" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="180" y1="65" x2="180" y2="40" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="135" x2="160" y2="155" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="65" y1="125" x2="80" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="80" y1="100" x2="180" y2="50" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><circle cx="180" cy="40" r="6" fill="#5F5E5A"/></svg>`,
 
-  respiracao: `<svg
+  respiracao: `<svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="160" x2="230" y2="160" stroke="#888" stroke-width="2"/><circle cx="60" cy="135" r="11" fill="#1D9E75"/><line x1="71" y1="135" x2="190" y2="135" stroke="#1D9E75" stroke-width="5" stroke-linecap="round"/><line x1="100" y1="125" x2="115" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><circle cx="120" cy="120" r="20" fill="none" stroke="#EF9F27" stroke-width="2" stroke-dasharray="4,3"/><circle cx="120" cy="120" r="32" fill="none" stroke="#EF9F27" stroke-width="2" stroke-dasharray="4,3" opacity="0.6"/><text x="120" y="55" font-family="sans-serif" font-size="11" fill="#888" text-anchor="middle">barriga sobe e desce</text></svg>`
+};
+
+const TRAININGS = {
+  'A': {
+    name: 'Treino A — Empurrar e core',
+    subtitle: 'Peito, ombros, tríceps e core',
+    type: 'forca',
+    warning: 'Hipertensão: nunca prenda o ar. Solte o ar quando empurrar, puxe o ar quando voltar.',
+    exercises: [
+      { id: 'a1', name: 'Marcha no lugar com braços (aquecimento)', sets: '7 minutos', icon: 'marcha',
+        how: 'Marche no lugar elevando bem os joelhos e mexendo os braços. Aumente o ritmo gradualmente.',
+        steps: ['Comece em ritmo lento nos primeiros 2 minutos', 'Aumente para ritmo médio nos próximos 3 minutos', 'Eleve mais os joelhos (até a altura do quadril) nos últimos 2 minutos', 'Mexa os braços naturalmente, alternando com as pernas', 'Mantenha um ritmo onde ainda consegue conversar'],
+        tip: 'O objetivo é aquecer e elevar levemente a frequência cardíaca antes do treino de força.' },
+
+      { id: 'a2', name: 'Flexão de braço no apoio', sets: '4 séries de 10 repetições', icon: 'flexao',
+        how: 'Apoie as mãos no apoio para flexões. Joelhos no chão se necessário, ou pés se conseguir.',
+        steps: ['Posicione o apoio no chão na largura dos ombros', 'Apoie os joelhos (versão fácil) ou os pés (versão completa)', 'Mantenha o corpo reto da cabeça aos joelhos ou calcanhares', 'Desça o peito em 3 segundos até quase tocar o chão', 'Empurre para subir em 2 segundos, soltando o ar'],
+        tip: 'Se 10 estiver fácil, faça 12 ou 15. Se difícil, faça quantas conseguir mantendo a forma.',
+        danger: 'Não desça se sentir dor no ombro. Tente a versão com apoio mais alto na parede.' },
+
+      { id: 'a3', name: 'Remada com elástico na parede', sets: '4 séries de 15 repetições', icon: 'remada',
+        how: 'Prenda o elástico na parede na altura do peito. Puxe na direção do umbigo com força.',
+        steps: ['Prenda o elástico em um suporte na parede, altura do peito', 'Em pé, joelhos levemente flexionados, postura firme', 'Estenda os braços segurando as pontas do elástico', 'Puxe os cotovelos para trás com força, juntando as omoplatas', 'Segure 1 segundo na contração e volte controlado em 3 segundos'],
+        tip: 'Aperte bem as omoplatas no final. Se estiver fácil, afaste mais da parede para aumentar a tensão.' },
+
+      { id: 'a4', name: 'Desenvolvimento com halteres', sets: '4 séries de 10 repetições', icon: 'rosca',
+        how: 'Sentado ou em pé, halteres na altura dos ombros. Empurre acima da cabeça.',
+        steps: ['Sente em uma cadeira com encosto firme (mais seguro para a coluna)', 'Halteres de 6 a 8 kg em cada mão, na altura dos ombros', 'Cotovelos a 90 graus, palmas viradas para frente', 'Empurre os halteres para cima até quase estender os braços', 'Solte o ar enquanto sobe, desça controlado em 3 segundos'],
+        tip: 'Não trave os cotovelos no topo. Mantenha sempre uma leve flexão.',
+        danger: 'CUIDADO com a pressão arterial. Solte o ar enquanto empurra para cima.' },
+
+      { id: 'a5', name: 'Elevação lateral com halteres', sets: '4 séries de 12 repetições', icon: 'elev_lateral',
+        how: 'Use halteres de 4 a 6 kg. Eleve os braços para o lado até a altura dos ombros.',
+        steps: ['Em pé com um halter em cada mão, ao lado do corpo', 'Cotovelos levemente flexionados', 'Eleve os braços para o lado até a altura dos ombros', 'Não passe da linha do ombro', 'Desça controlado em 3 segundos'],
+        tip: 'O ombro prefere repetições controladas. Se o halter balançar, está pesado demais.' },
+
+      { id: 'a6', name: 'Tríceps com superband', sets: '4 séries de 15 repetições', icon: 'triceps',
+        how: 'Prenda a superband em um ponto alto. Puxe para baixo mantendo o cotovelo fixo.',
+        steps: ['Prenda o elástico em um ponto acima da cabeça', 'Em pé, segure a ponta com as duas mãos', 'Cotovelos colados ao corpo, não devem se mover', 'Estenda os braços para baixo, esticando os cotovelos', 'Aperte o tríceps no final, volte controlado'],
+        tip: 'Cotovelo é o eixo. Apenas o antebraço se move. Se fácil, afaste mais para aumentar tensão.' },
+
+      { id: 'a7', name: 'Prancha frontal', sets: '3 séries de 30 segundos', icon: 'prancha',
+        how: 'Apoie os antebraços e os pés no chão. Corpo reto, barriga contraída.',
+        steps: ['Deite de bruços', 'Apoie os antebraços no chão, cotovelos abaixo dos ombros', 'Levante o corpo apoiado nos antebraços e pés', 'Corpo reto da cabeça aos calcanhares', 'Contraia a barriga e o glúteo, segure 30 segundos respirando normalmente'],
+        tip: 'Se 30 segundos for muito, faça 20. Se fácil, vá para 45 segundos.',
+        danger: 'NUNCA prenda o ar. Respire normalmente durante o exercício.' },
+
+      { id: 'a8', name: 'Abdominal supra (crunch)', sets: '4 séries de 20 repetições', icon: 'abdominal',
+        how: 'Deitado de costas, joelhos flexionados. Levante a parte alta das costas com força.',
+        steps: ['Deite de costas com joelhos dobrados, pés no chão', 'Mãos atrás da cabeça, sem puxá-la', 'Levante a parte alta das costas, soltando o ar', 'Aperte o abdômen no topo do movimento', 'Desça controlado, sem deixar a cabeça cair'],
+        tip: 'Movimento curto e contraído. Foque em apertar o abdômen, não em chegar perto do joelho.' },
+
+      { id: 'a9', name: 'Alongamento e respiração final', sets: '6 minutos', icon: 'respiracao',
+        how: 'Alongue peito, ombros e tríceps. Termine com respiração diafragmática.',
+        steps: ['Alongue o peito (mãos atrás da nuca, abrir cotovelos): 30 segundos', 'Alongue cada ombro cruzando o braço no peito: 30 segundos cada', 'Alongue cada tríceps puxando o cotovelo atrás da cabeça: 30 segundos cada', 'Deite de costas, mão na barriga', 'Respire fundo 10 vezes, sentindo a barriga subir e descer'],
+        tip: 'A respiração diafragmática ajuda a controlar a pressão arterial após o exercício.' }
+    ]
+  },
+
+  'B': {
+    name: 'Treino B — Puxar e pernas',
+    subtitle: 'Bíceps, costas, glúteo, pernas e core',
+    type: 'forca',
+    warning: 'Joelho sensível: nunca passe dos 90 graus de flexão. Se sentir dor, pare imediatamente.',
+    exercises: [
+      { id: 'b1', name: 'Marcha + rotação de ombros (aquecimento)', sets: '7 minutos', icon: 'marcha',
+        how: 'Marche no lugar fazendo movimentos circulares com os ombros e braços.',
+        steps: ['Marche no lugar nos primeiros 2 minutos em ritmo médio', 'Faça círculos para trás com os ombros nos próximos 2 minutos', 'Faça círculos para frente nos próximos 2 minutos', 'No último minuto, eleve e abaixe os braços lateralmente'],
+        tip: 'Movimente todas as articulações dos ombros para preparar para os exercícios de costas.' },
+
+      { id: 'b2', name: 'Rosca direta com halteres', sets: '4 séries de 12 repetições', icon: 'rosca',
+        how: 'Em pé, com halteres de 8 a 10 kg. Flexione os cotovelos com força.',
+        steps: ['Em pé, halter em cada mão, braços estendidos', 'Cotovelos colados na lateral do corpo, não devem se mover', 'Flexione os cotovelos subindo o halter até a altura dos ombros', 'Aperte o bíceps no topo do movimento', 'Desça controlado em 3 segundos'],
+        tip: 'Cotovelo fixo. Se balançar o tronco, o peso está pesado demais.' },
+
+      { id: 'b3', name: 'Puxada alta com superband', sets: '4 séries de 15 repetições', icon: 'puxada',
+        how: 'Prenda a superband em um ponto alto. Puxe para baixo na frente do peito com força.',
+        steps: ['Prenda o elástico bem alto, em batente da porta ou suporte', 'Sente em uma cadeira ou ajoelhe no chão', 'Segure as duas pontas com os braços estendidos para cima', 'Puxe trazendo as mãos até a frente do peito', 'Junte as omoplatas com força no final do movimento'],
+        tip: 'Imagine que está colocando os cotovelos no bolso de trás da calça.' },
+
+      { id: 'b4', name: 'Remada curvada com halteres', sets: '4 séries de 12 repetições', icon: 'bent_over',
+        how: 'Inclinado para frente com halteres. Puxe os halteres em direção ao quadril.',
+        steps: ['Em pé, halteres de 8 a 10 kg em cada mão', 'Incline o tronco para frente em 45 graus, costas retas', 'Joelhos levemente flexionados, halteres pendurados', 'Puxe os halteres em direção ao quadril, juntando as omoplatas', 'Desça controlado em 3 segundos'],
+        tip: 'Costas retas. Se a coluna arredondar, alivie o peso ou faça menos repetições.',
+        danger: 'Se sentir dor lombar, faça sentado em uma cadeira inclinado para frente.' },
+
+      { id: 'b5', name: 'Ponte de glúteo', sets: '4 séries de 20 repetições', icon: 'ponte',
+        how: 'Deitado de costas, joelhos dobrados. Eleve o quadril com força contraindo o glúteo.',
+        steps: ['Deite de costas, joelhos dobrados em 90 graus, pés no chão', 'Braços ao lado do corpo', 'Eleve o quadril contraindo o glúteo com força, soltando o ar', 'Linha reta entre joelhos, quadril e ombros no topo', 'Aperte o glúteo por 2 segundos no topo, desça controlado'],
+        tip: 'Sinta o glúteo trabalhando, não a lombar. O segredo é apertar bem no topo do movimento.' },
+
+      { id: 'b6', name: 'Ponte de glúteo com peso', sets: '3 séries de 15 repetições', icon: 'ponte',
+        how: 'Mesma ponte de glúteo, mas com um halter (10 kg) sobre o quadril.',
+        steps: ['Deite de costas como na ponte normal', 'Coloque um halter de 8 a 12 kg sobre o quadril, segurando com as mãos', 'Eleve o quadril com força, soltando o ar', 'Aperte o glúteo no topo por 2 segundos', 'Desça controlado'],
+        tip: 'Esse é o exercício de pernas mais seguro para joelho problemático. Trabalha glúteo e isquiotibiais.' },
+
+      { id: 'b7', name: 'Abdução com miniband sentado', sets: '4 séries de 20 repetições', icon: 'abducao',
+        how: 'Sentado em uma cadeira, com a miniband acima dos joelhos. Abra as pernas com força.',
+        steps: ['Sentado em uma cadeira, costas retas', 'Miniband logo acima dos joelhos', 'Pés afastados na largura do quadril', 'Abra os joelhos com força contra a resistência do elástico', 'Aperte o glúteo lateral, volte controlado'],
+        tip: 'Esse exercício fortalece o glúteo médio, que protege e estabiliza o joelho.' },
+
+      { id: 'b8', name: 'Dead bug (core profundo)', sets: '4 séries de 12 repetições', icon: 'deadbug',
+        how: 'Deitado de costas com braços e pernas no ar. Estique braço e perna OPOSTOS.',
+        steps: ['Deite de costas, braços apontados para o teto', 'Joelhos e quadris dobrados em 90 graus, no ar', 'Estenda lentamente o braço direito para trás e a perna esquerda para frente', 'Mantenha a lombar colada no chão', 'Volte e alterne para o outro lado (cada lado conta como 1 repetição)'],
+        tip: 'Movimento lento e controlado. A qualidade vale mais que a velocidade.',
+        danger: 'A lombar precisa ficar colada no chão sempre. Se arquear, diminua a amplitude.' },
+
+      { id: 'b9', name: 'Alongamento e respiração final', sets: '6 minutos', icon: 'alongamento',
+        how: 'Alongue isquiotibiais, glúteo e coluna. Termine com respiração diafragmática.',
+        steps: ['Sente no chão com uma perna estendida e outra dobrada', 'Tente alcançar o pé da perna estendida (joelho semi-flexionado): 30 segundos cada lado', 'Deitado, abrace os dois joelhos no peito por 30 segundos', 'Cruze um joelho sobre o outro deitado para alongar o glúteo: 30 segundos cada lado', 'Deite e faça 10 respirações diafragmáticas profundas'],
+        tip: 'Não force o alongamento. Vá até onde a perna permite sem dor.' }
+    ]
+  },
+
+  'C': {
+    name: 'Treino C — Cardio leve',
+    subtitle: 'Cardiovascular de baixo impacto',
+    type: 'cardio',
+    warning: 'Frequência cardíaca alvo: 85 a 110 batimentos por minuto. Se passar disso, diminua o ritmo.',
+    exercises: [
+      { id: 'c1', name: 'Caminhada ou bicicleta', sets: '40 a 45 minutos', icon: 'caminhada',
+        how: 'Cardio contínuo de baixo impacto. Caminhada ou bicicleta ergométrica.',
+        steps: ['Use tênis com bom amortecimento se for caminhar', 'Comece devagar nos primeiros 5 minutos para aquecer', 'Aumente para um ritmo moderado onde consegue falar mas não cantar', 'Mantenha esse ritmo por 30 a 35 minutos', 'Termine com 5 minutos mais lento para resfriar'],
+        tip: 'Se estiver fácil, aumente o ritmo. Se for caminhada, pode incluir uma leve subida nos minutos centrais.' },
+
+      { id: 'c2', name: 'Caminhada com mudança de ritmo (alternativa)', sets: '30 a 35 minutos', icon: 'caminhada',
+        how: 'Alterne 2 minutos em ritmo médio com 1 minuto em ritmo mais forte.',
+        steps: ['Aqueça em ritmo lento por 5 minutos', 'Caminhe 2 minutos em ritmo médio', 'Acelere para ritmo forte (mas sem correr) por 1 minuto', 'Volte ao ritmo médio por 2 minutos', 'Repita o ciclo por 25 minutos, termine com 5 minutos lento'],
+        tip: 'Esse formato queima mais gordura que o ritmo contínuo. Faça 1 vez por semana, no máximo.' },
+
+      { id: 'c3', name: 'Alongamento e respiração final', sets: '5 minutos', icon: 'respiracao',
+        how: 'Alongue panturrilha, isquiotibiais e quadríceps. Termine com respiração.',
+        steps: ['Alongue cada panturrilha por 30 segundos', 'Alongue isquiotibiais com joelho semi-flexionado: 30 segundos cada lado', 'Alongue quadríceps puxando o pé para o glúteo (apoie em uma parede): 30 segundos cada lado', 'Faça 10 respirações profundas em pé ou deitado'],
+        tip: 'O alongamento pós-cardio reduz o cansaço no dia seguinte e a sensação de pernas pesadas.' }
+    ]
+  },
+
+  'D': {
+    name: 'Recuperação ativa',
+    subtitle: 'Movimento leve para recuperar o corpo',
+    type: 'recuperacao',
+    warning: 'Hoje é dia leve. Movimento sem stress acelera a recuperação muscular.',
+    exercises: [
+      { id: 'd1', name: 'Caminhada leve', sets: '25 minutos', icon: 'caminhada',
+        how: 'Caminhada bem leve, ritmo de passeio, sem inclinação.',
+        steps: ['Saia para caminhar em ritmo de passeio', 'Pode ser no bairro, parque ou em esteira', 'Mantenha um ritmo onde consegue cantar tranquilo', 'Não precisa elevar muito a frequência cardíaca'],
+        tip: 'Hoje é leveza. Sem competir com você mesmo. O objetivo é circulação, não treino.' },
+
+      { id: 'd2', name: 'Mobilidade de quadril', sets: '10 minutos', icon: 'alongamento',
+        how: 'Movimentos circulares e alongamentos para o quadril.',
+        steps: ['Deite de costas, joelhos dobrados', 'Faça 10 círculos com cada joelho para fora', 'Cruze o tornozelo no joelho oposto (figura 4) e segure 30 segundos cada lado', 'Abrace os dois joelhos no peito por 30 segundos', 'Faça rotações suaves com os joelhos juntos'],
+        tip: 'Quadril livre alivia a carga no joelho ao longo do dia.' },
+
+      { id: 'd3', name: 'Alongamento global suave', sets: '10 minutos', icon: 'alongamento',
+        how: 'Alongue peito, ombros, lombar e isquiotibiais. Sempre com joelho semi-flexionado.',
+        steps: ['Alongamento de peito (mãos atrás da nuca, abrir cotovelos): 30 segundos', 'Alongamento de ombros (braço cruzado no peito): 30 segundos cada lado', 'Alongamento de lombar (joelhos no peito deitado): 30 segundos', 'Alongamento de isquiotibial (joelho semi-flexionado): 30 segundos cada lado', 'Alongamento de panturrilha em pé apoiado na parede: 30 segundos cada lado'],
+        tip: 'Sem dor. Apenas até sentir o músculo distendido.' },
+
+      { id: 'd4', name: 'Respiração consciente', sets: '10 minutos', icon: 'respiracao',
+        how: 'Respiração diafragmática deitado, focada em relaxar.',
+        steps: ['Deite confortável em um lugar tranquilo', 'Mão na barriga e outra no peito', 'Inspire pelo nariz fazendo a barriga subir (4 segundos)', 'Segure 2 segundos', 'Solte o ar pela boca devagar (6 segundos)', 'Repita por 10 minutos'],
+        tip: 'Reduz cortisol, melhora o sono e auxilia o controle da pressão arterial.' }
+    ]
+  }
+};
+
+const WEEK_PLAN = ['A', 'B', 'C', 'D', 'D', 'A', 'B'];
+const DAY_NAMES = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
+
+function getStorageData() {
+  try {
+    const raw = localStorage.getItem('treinoEdgard');
+    if (!raw) return { history: {}, completed: {} };
+    return JSON.parse(raw);
+  } catch (e) {
+    return { history: {}, completed: {} };
+  }
+}
+
+function saveStorageData(data) {
+  try {
+    localStorage.setItem('treinoEdgard', JSON.stringify(data));
+  } catch (e) { console.error(e); }
+}
+
+function getDateKey(d) {
+  const yr = d.getFullYear();
+  const mo = String(d.getMonth() + 1).padStart(2, '0');
+  const dy = String(d.getDate()).padStart(2, '0');
+  return `${yr}-${mo}-${dy}`;
+}
+
+function formatDateBr(d) {
+  const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  return `${d.getDate()} de ${months[d.getMonth()]} de ${d.getFullYear()}`;
+}
+
+function getWeekDates() {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const monday = new Date(today);
+  const offset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  monday.setDate(today.getDate() + offset);
+  const dates = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    dates.push(d);
+  }
+  return dates;
+}
+
+function getTrainingForDate(d) {
+  const dayOfWeek = d.getDay();
+  const map = [6, 0, 1, 2, 3, 4, 5];
+  return WEEK_PLAN[map[dayOfWeek]];
+}
+
+let currentDate = new Date();
+let activeView = 'today';
+
+function renderHeader() {
+  const today = new Date();
+  document.getElementById('header-date').textContent = formatDateBr(today);
+}
+
+function renderStats() {
+  const data = getStorageData();
+  const history = data.history || {};
+  const today = new Date();
+
+  const completedDates = Object.keys(history).sort();
+  const totalCount = completedDates.length;
+
+  let streak = 0;
+  let checkDate = new Date(today);
+  while (true) {
+    const key = getDateKey(checkDate);
+    if (history[key]) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else {
+      const trainingType = getTrainingForDate(checkDate);
+      if (trainingType === 'rest' && getDateKey(checkDate) !== getDateKey(today)) {
+        checkDate.setDate(checkDate.getDate() - 1);
+        continue;
+      }
+      break;
+    }
+  }
+
+  const weekDates = getWeekDates();
+  let weekDone = 0;
+  let weekTotal = 0;
+  weekDates.forEach(d => {
+    const t = getTrainingForDate(d);
+    if (t !== 'rest') {
+      weekTotal++;
+      if (history[getDateKey(d)]) weekDone++;
+    }
+  });
+
+  document.getElementById('stat-streak').textContent = streak;
+  document.getElementById('stat-total').textContent = totalCount;
+  document.getElementById('stat-week').textContent = `${weekDone}/${weekTotal}`;
+}
+
+function renderDayGrid() {
+  const grid = document.getElementById('day-grid');
+  const data = getStorageData();
+  const dates = getWeekDates();
+  const todayKey = getDateKey(new Date());
+  const currentKey = getDateKey(currentDate);
+
+  grid.innerHTML = '';
+  dates.forEach((d) => {
+    const dayName = DAY_NAMES[d.getDay()];
+    const key = getDateKey(d);
+    const trainingType = getTrainingForDate(d);
+    const isCompleted = !!(data.history && data.history[key]);
+    const isToday = key === todayKey;
+    const isActive = key === currentKey;
+    const isRest = trainingType === 'rest';
+
+    const btn = document.createElement('button');
+    btn.className = 'day-btn';
+    if (isActive) btn.classList.add('active');
+    if (isCompleted) btn.classList.add('completed');
+    if (isRest) btn.classList.add('rest');
+
+    btn.innerHTML = `
+      <div class="day-name">${dayName}${isToday ? ' (hoje)' : ''}</div>
+      <div class="day-num">${d.getDate()}</div>
+      <div class="day-dot"></div>
+    `;
+    btn.addEventListener('click', () => {
+      currentDate = d;
+      renderTrainingArea();
+      renderDayGrid();
+    });
+    grid.appendChild(btn);
+  });
+}
+
+function renderTrainingArea() {
+  const area = document.getElementById('training-area');
+  const trainingType = getTrainingForDate(currentDate);
+  const dateKey = getDateKey(currentDate);
+  const data = getStorageData();
+  const isCompleted = !!(data.history && data.history[dateKey]);
+
+  if (trainingType === 'rest') {
+    area.innerHTML = `
+      <div class="rest-day-card">
+        <div class="icon-circle">●</div>
+        <h3>Dia de descanso</h3>
+        <p>Hoje é descanso completo. Beba bastante água e durma bem. Amanhã treinamos de novo.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const training = TRAININGS[trainingType];
+  const completedExercises = (data.completed && data.completed[dateKey]) || {};
+  const totalEx = training.exercises.length;
+  const doneEx = Object.values(completedExercises).filter(v => v).length;
+  const progressPct = Math.round((doneEx / totalEx) * 100);
+
+  let html = `
+    <div class="training-info-card">
+      <div class="training-title">${training.name}</div>
+      <div class="training-subtitle">${training.subtitle}</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" style="width: ${progressPct}%"></div>
+      </div>
+      <div class="progress-text">
+        <span>${doneEx} de ${totalEx} exercícios</span>
+        <span>${progressPct}%</span>
+      </div>
+    </div>
+
+    <div class="warning-box"><strong>Atenção:</strong> ${training.warning}</div>
+
+    <div class="exercise-list">
+  `;
+
+  training.exercises.forEach((ex, idx) => {
+    const isDone = !!completedExercises[ex.id];
+    const stepsHtml = ex.steps.map(s => `<li>${s}</li>`).join('');
+    html += `
+      <div class="exercise-card ${isDone ? 'done' : ''}" data-id="${ex.id}">
+        <div class="exercise-header">
+          <div class="exercise-checkbox" onclick="toggleExercise('${ex.id}', event)">
+            <span class="checkmark">✓</span>
+          </div>
+          <div class="exercise-info" onclick="toggleExpand('${ex.id}')">
+            <div class="exercise-name">${idx + 1}. ${ex.name}</div>
+            <div class="exercise-meta"><span class="badge">${ex.sets}</span></div>
+          </div>
+          <button class="expand-btn" onclick="toggleExpand('${ex.id}')">
+            <span class="expand-icon">▾</span>
+          </button>
+        </div>
+        <div class="exercise-detail">
+          <div class="exercise-svg-container">${SVG_FIGURES[ex.icon] || ''}</div>
+          <div class="detail-section">
+            <div class="detail-label">Como fazer</div>
+            <div class="detail-text">${ex.how}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label">Passo a passo</div>
+            <div class="detail-text"><ol>${stepsHtml}</ol></div>
+          </div>
+          ${ex.tip ? `<div class="tip-box"><strong>Dica:</strong> ${ex.tip}</div>` : ''}
+          ${ex.danger ? `<div class="danger-box"><strong>Cuidado:</strong> ${ex.danger}</div>` : ''}
+        </div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+
+  if (!isCompleted) {
+    const allDone = doneEx === totalEx;
+    html += `
+      <button class="complete-btn" onclick="completeTraining()" ${allDone ? '' : 'disabled'}>
+        ${allDone ? 'Marcar treino como concluído' : `Faltam ${totalEx - doneEx} exercícios`}
+      </button>
+    `;
+  } else {
+    html += `<button class="complete-btn" disabled style="background: var(--green-100); color: var(--green-700);">Treino concluído ✓</button>`;
+  }
+
+  area.innerHTML = html;
+}
+
+window.toggleExpand = function(id) {
+  const card = document.querySelector(`[data-id="${id}"]`);
+  if (card) card.classList.toggle('expanded');
+};
+
+window.toggleExercise = function(id, event) {
+  if (event) event.stopPropagation();
+  const data = getStorageData();
+  const dateKey = getDateKey(currentDate);
+  if (!data.completed) data.completed = {};
+  if (!data.completed[dateKey]) data.completed[dateKey] = {};
+  data.completed[dateKey][id] = !data.completed[dateKey][id];
+  saveStorageData(data);
+  renderTrainingArea();
+};
+
+window.completeTraining = function() {
+  const data = getStorageData();
+  const dateKey = getDateKey(currentDate);
+  if (!data.history) data.history = {};
+  const trainingType = getTrainingForDate(currentDate);
+  data.history[dateKey] = {
+    type: trainingType,
+    name: TRAININGS[trainingType].name,
+    completedAt: new Date().toISOString()
+  };
+  saveStorageData(data);
+
+  const messages = [
+    'Mais um treino na conta. O corpo agradece!',
+    'Excelente! A consistência é o segredo.',
+    'Treino concluído. Cada dia conta.',
+    'Mais um dia mais forte. Continue assim!',
+    'Parabéns pela disciplina!'
+  ];
+  document.getElementById('modal-message').textContent = messages[Math.floor(Math.random() * messages.length)];
+  document.getElementById('modal').classList.add('show');
+  renderTrainingArea();
+  renderStats();
+  renderDayGrid();
+};
+
+window.closeModal = function() {
+  document.getElementById('modal').classList.remove('show');
+};
+
+window.switchView = function(view, btn) {
+  activeView = view;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-bottom').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (view === 'history') renderHistory();
+};
+
+function renderHistory() {
+  const data = getStorageData();
+  const history = data.history || {};
+  const list = document.getElementById('history-list');
+  const entries = Object.entries(history).sort((a, b) => b[0].localeCompare(a[0]));
+
+  if (entries.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div style="font-size: 32px; margin-bottom: 8px;">○</div>
+        <p>Nenhum treino concluído ainda.<br>Comece hoje!</p>
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = entries.map(([dateKey, info]) => {
+    const [yr, mo, dy] = dateKey.split('-');
+    const d = new Date(parseInt(yr), parseInt(mo) - 1, parseInt(dy));
+    const dayName = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][d.getDay()];
+    return `
+      <div class="history-item">
+        <div>
+          <div class="date">${dayName}, ${dy}/${mo}/${yr}</div>
+          <div class="training-name">${info.name}</div>
+        </div>
+        <div class="stat">✓</div>
+      </div>
+    `;
+  }).join('');
+}
+
+window.resetData = function() {
+  if (confirm('Tem certeza? Isso apagará todo o histórico de treinos.')) {
+    localStorage.removeItem('treinoEdgard');
+    location.reload();
+  }
+};
+
+renderHeader();
+renderStats();
+renderDayGrid();
+renderTrainingArea();
+</script>
+</body>
+</html>
