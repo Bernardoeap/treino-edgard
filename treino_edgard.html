@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Treino do Edgard</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --green-50: #E1F5EE;
+  --green-100: #9FE1CB;
+  --green-400: #1D9E75;
+  --green-700: #0F6E56;
+  --green-900: #04342C;
+  --amber-50: #FAEEDA;
+  --amber-400: #EF9F27;
+  --amber-700: #854F0B;
+  --red-50: #FCEBEB;
+  --red-400: #E24B4A;
+  --red-700: #791F1F;
+  --blue-50: #E6F1FB;
+  --blue-400: #378ADD;
+  --blue-700: #0C447C;
+  --gray-50: #FAFAF7;
+  --gray-100: #F1EFE8;
+  --gray-200: #D3D1C7;
+  --gray-400: #888780;
+  --gray-700: #444441;
+  --gray-900: #2C2C2A;
+  --bg: #FAFAF7;
+  --card: #FFFFFF;
+  --border: rgba(0,0,0,0.08);
+  --shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--gray-900);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 100px;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.app-header {
+  background: linear-gradient(135deg, var(--green-700) 0%, var(--green-400) 100%);
+  color: white;
+  padding: 24px 16px 28px;
+  margin-bottom: 16px;
+}
+
+.app-header-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.app-header h1 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.app-header .subtitle {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.streak-card {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.streak-stat { text-align: center; }
+.streak-stat .num { font-size: 24px; font-weight: 600; }
+.streak-stat .label { font-size: 11px; opacity: 0.85; }
+.streak-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.3); }
+
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+  margin-top: 20px;
+  padding: 0 4px;
+}
+
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.day-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.day-btn:active { transform: scale(0.96); }
+
+.day-btn .day-name {
+  font-size: 10px;
+  color: var(--gray-400);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.day-btn .day-num {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-top: 2px;
+}
+
+.day-btn .day-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin: 4px auto 0;
+  background: var(--gray-200);
+}
+
+.day-btn.active {
+  background: var(--green-50);
+  border-color: var(--green-400);
+}
+
+.day-btn.active .day-name,
+.day-btn.active .day-num { color: var(--green-700); }
+
+.day-btn.completed .day-dot { background: var(--green-400); }
+.day-btn.rest .day-dot { background: var(--amber-400); }
+
+.training-info-card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.training-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 4px;
+}
+
+.training-subtitle {
+  font-size: 13px;
+  color: var(--gray-400);
+  margin-bottom: 12px;
+}
+
+.progress-bar-container {
+  background: var(--gray-100);
+  border-radius: 8px;
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-bar-fill {
+  background: var(--green-400);
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: var(--gray-400);
+  display: flex;
+  justify-content: space-between;
+}
+
+.warning-box {
+  background: var(--amber-50);
+  border-left: 3px solid var(--amber-400);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--amber-700);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.warning-box strong { color: #5C3804; }
+
+.exercise-list { display: flex; flex-direction: column; gap: 10px; }
+
+.exercise-card {
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.exercise-card.done {
+  background: var(--green-50);
+  border-color: var(--green-100);
+}
+
+.exercise-header {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.exercise-checkbox {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-200);
+  background: white;
+  flex-shrink: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.exercise-checkbox:active { transform: scale(0.92); }
+
+.exercise-card.done .exercise-checkbox {
+  background: var(--green-400);
+  border-color: var(--green-400);
+}
+
+.checkmark { display: none; color: white; font-size: 16px; font-weight: bold; }
+.exercise-card.done .checkmark { display: block; }
+
+.exercise-info { flex: 1; min-width: 0; }
+
+.exercise-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 2px;
+}
+
+.exercise-card.done .exercise-name {
+  text-decoration: line-through;
+  color: var(--gray-400);
+}
+
+.exercise-meta {
+  font-size: 12px;
+  color: var(--gray-400);
+}
+
+.exercise-meta .badge {
+  display: inline-block;
+  background: var(--blue-50);
+  color: var(--blue-700);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.expand-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-400);
+  flex-shrink: 0;
+}
+
+.expand-btn:active { background: var(--gray-100); }
+
+.expand-icon {
+  transition: transform 0.2s;
+  font-size: 18px;
+}
+
+.exercise-card.expanded .expand-icon { transform: rotate(180deg); }
+
+.exercise-detail {
+  display: none;
+  padding: 0 12px 16px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.exercise-card.expanded .exercise-detail { display: block; }
+
+.exercise-svg-container {
+  background: var(--gray-50);
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  min-height: 180px;
+  align-items: center;
+}
+
+.exercise-svg-container svg {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+}
+
+.detail-section { margin-bottom: 12px; }
+
+.detail-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.detail-text {
+  font-size: 13px;
+  color: var(--gray-700);
+  line-height: 1.6;
+}
+
+.detail-text ol, .detail-text ul { margin-left: 18px; }
+
+.detail-text li { margin-bottom: 3px; }
+
+.tip-box {
+  background: var(--blue-50);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--blue-700);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.danger-box {
+  background: var(--red-50);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--red-700);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.complete-btn {
+  width: 100%;
+  background: var(--green-400);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 16px;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.complete-btn:active { transform: scale(0.98); background: var(--green-700); }
+
+.complete-btn:disabled {
+  background: var(--gray-200);
+  color: var(--gray-400);
+  cursor: not-allowed;
+}
+
+.rest-day-card {
+  background: var(--amber-50);
+  border-radius: 14px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 16px;
+  border: 1px solid var(--amber-50);
+}
+
+.rest-day-card .icon-circle {
+  width: 56px;
+  height: 56px;
+  background: var(--amber-400);
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 28px;
+}
+
+.rest-day-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--amber-700);
+  margin-bottom: 6px;
+}
+
+.rest-day-card p {
+  font-size: 13px;
+  color: var(--amber-700);
+  opacity: 0.9;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s;
+}
+
+.modal-overlay.show { display: flex; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+}
+
+.modal .icon-circle {
+  width: 64px;
+  height: 64px;
+  background: var(--green-50);
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green-400);
+  font-size: 32px;
+}
+
+.modal h2 { font-size: 18px; margin-bottom: 8px; }
+.modal p { font-size: 14px; color: var(--gray-400); margin-bottom: 16px; }
+
+.modal button {
+  background: var(--green-400);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+}
+
+.tabs-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  z-index: 50;
+}
+
+.tab-bottom {
+  flex: 1;
+  padding: 14px 8px 18px;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  color: var(--gray-400);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.tab-bottom.active { color: var(--green-400); }
+
+.tab-bottom .tab-icon { font-size: 20px; display: block; margin-bottom: 2px; }
+
+.view { display: none; padding-top: 8px; }
+.view.active { display: block; }
+
+.history-item {
+  background: var(--card);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 12px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.history-item .date {
+  font-size: 12px;
+  color: var(--gray-400);
+  margin-bottom: 2px;
+}
+
+.history-item .training-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-900);
+}
+
+.history-item .stat {
+  text-align: right;
+  font-size: 12px;
+  color: var(--green-400);
+  font-weight: 600;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--gray-400);
+}
+
+.empty-state svg { width: 64px; height: 64px; margin: 0 auto 12px; opacity: 0.3; }
+
+.info-section {
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.info-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--gray-900);
+}
+
+.info-section p, .info-section li {
+  font-size: 13px;
+  color: var(--gray-700);
+  line-height: 1.6;
+}
+
+.info-section ul, .info-section ol { margin-left: 18px; }
+.info-section li { margin-bottom: 4px; }
+
+.btn-secondary {
+  background: var(--gray-100);
+  color: var(--gray-700);
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+  margin-top: 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="app-header-inner">
+    <h1>Bom dia, Edgard</h1>
+    <div class="subtitle" id="header-date">Vamos treinar hoje?</div>
+    <div class="streak-card">
+      <div class="streak-stat">
+        <div class="num" id="stat-streak">0</div>
+        <div class="label">dias seguidos</div>
+      </div>
+      <div class="streak-divider"></div>
+      <div class="streak-stat">
+        <div class="num" id="stat-total">0</div>
+        <div class="label">treinos feitos</div>
+      </div>
+      <div class="streak-divider"></div>
+      <div class="streak-stat">
+        <div class="num" id="stat-week">0/5</div>
+        <div class="label">esta semana</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="view active" id="view-today">
+    <div class="section-title">Esta semana</div>
+    <div class="day-grid" id="day-grid"></div>
+
+    <div id="training-area"></div>
+  </div>
+
+  <div class="view" id="view-history">
+    <div class="section-title">Histórico de treinos</div>
+    <div id="history-list"></div>
+  </div>
+
+  <div class="view" id="view-info">
+    <div class="section-title">Informações importantes</div>
+
+    <div class="info-section">
+      <h3>Antes de começar a treinar</h3>
+      <ol>
+        <li>Meça a pressão arterial. Se estiver acima de 160/100, faça apenas a recuperação ativa.</li>
+        <li>Beba 1 copo de água.</li>
+        <li>Use roupa confortável e tênis com bom amortecimento.</li>
+        <li>Tenha água por perto durante o treino.</li>
+      </ol>
+    </div>
+
+    <div class="info-section">
+      <h3>Regras de ouro</h3>
+      <ul>
+        <li>Descanso entre séries: 60 a 90 segundos.</li>
+        <li>Respiração: solte o ar no esforço, puxe o ar na descida. Nunca prenda o ar.</li>
+        <li>Joelho: nunca passe dos 90 graus de flexão.</li>
+        <li>Hidratação: beba água antes, durante e depois.</li>
+        <li>Velocidade: subir em 2 segundos, descer em 3 segundos.</li>
+      </ul>
+    </div>
+
+    <div class="info-section">
+      <h3>Pare imediatamente se sentir</h3>
+      <ul>
+        <li>Tontura ou vista escurecendo.</li>
+        <li>Dor no peito ou falta de ar grave.</li>
+        <li>Dor forte no joelho.</li>
+        <li>Pressão ou pulsação forte na cabeça.</li>
+        <li>Náusea ou enjoo.</li>
+      </ul>
+    </div>
+
+    <div class="info-section">
+      <h3>Equipamentos que você usa</h3>
+      <ul>
+        <li>Halteres até 14 kg.</li>
+        <li>Superbands (elásticos grandes).</li>
+        <li>Elásticos para prender na parede.</li>
+        <li>Apoio para flexões.</li>
+        <li>Miniband (elástico pequeno para as pernas).</li>
+      </ul>
+    </div>
+
+    <div class="info-section">
+      <h3>Sobre os 7 dias</h3>
+      <p>Você treina 5 dias com força e cardio, e tem 2 dias de recuperação ativa (movimento leve). Descanso total apenas no domingo é importante: o músculo cresce na recuperação, não no treino.</p>
+    </div>
+
+    <button class="btn-secondary" onclick="resetData()">Apagar todo o progresso</button>
+  </div>
+
+</div>
+
+<div class="tabs-bottom">
+  <button class="tab-bottom active" onclick="switchView('today', this)">
+    <span class="tab-icon">●</span>
+    Hoje
+  </button>
+  <button class="tab-bottom" onclick="switchView('history', this)">
+    <span class="tab-icon">▤</span>
+    Histórico
+  </button>
+  <button class="tab-bottom" onclick="switchView('info', this)">
+    <span class="tab-icon">?</span>
+    Guia
+  </button>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="icon-circle">✓</div>
+    <h2>Treino concluído!</h2>
+    <p id="modal-message">Mais um dia de progresso. Parabéns!</p>
+    <button onclick="closeModal()">Continuar</button>
+  </div>
+</div>
+
+<script>
+const SVG_FIGURES = {
+  marcha: `<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="40" r="14" fill="#1D9E75"/><line x1="100" y1="54" x2="100" y2="120" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="75" x2="75" y2="105" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="75" x2="125" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="120" x2="85" y2="180" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="120" x2="120" y2="155" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="155" x2="105" y2="125" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="60" y1="190" x2="140" y2="190" stroke="#888" stroke-width="2" stroke-dasharray="4,3"/><path d="M 130 145 Q 145 130 135 115" stroke="#EF9F27" stroke-width="2" fill="none" stroke-dasharray="3,2"/><polygon points="135,115 138,120 132,118" fill="#EF9F27"/></svg>`,
+
+  flexao: `<svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg"><line x1="20" y1="160" x2="220" y2="160" stroke="#888" stroke-width="2"/><circle cx="60" cy="90" r="12" fill="#1D9E75"/><line x1="72" y1="92" x2="160" y2="125" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="160" y1="125" x2="195" y2="135" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><rect x="190" y="125" width="14" height="20" fill="#5F5E5A" rx="2"/><line x1="65" y1="100" x2="50" y2="135" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="135" x2="65" y2="155" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="80" y1="100" x2="65" y2="135" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="65" y1="135" x2="80" y2="155" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><path d="M 110 80 L 110 60 L 130 60" stroke="#EF9F27" stroke-width="2" fill="none"/><polygon points="130,60 124,57 124,63" fill="#EF9F27"/><path d="M 110 130 L 110 145 L 130 145" stroke="#EF9F27" stroke-width="2" fill="none"/><polygon points="130,145 124,142 124,148" fill="#EF9F27"/></svg>`,
+
+  remada: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg"><rect x="210" y="20" width="8" height="160" fill="#888" rx="2"/><circle cx="100" cy="50" r="12" fill="#1D9E75"/><line x1="100" y1="62" x2="100" y2="120" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="80" x2="135" y2="95" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="135" y1="95" x2="155" y2="80" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="80" x2="135" y2="95" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="120" x2="80" y2="170" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="120" x2="120" y2="170" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><path d="M 155 80 Q 180 60 210 50" stroke="#E24B4A" stroke-width="3" fill="none" stroke-dasharray="6,4"/><path d="M 90 70 L 70 60" stroke="#EF9F27" stroke-width="2" fill="none"/><polygon points="70,60 76,57 76,63" fill="#EF9F27"/></svg>`,
+
+  elev_lateral: `<svg viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg"><circle cx="120" cy="40" r="14" fill="#1D9E75"/><line x1="120" y1="54" x2="120" y2="140" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="75" x2="80" y2="75" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="75" x2="160" y2="75" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><rect x="65" y="65" width="20" height="22" fill="#5F5E5A" rx="3"/><rect x="155" y="65" width="20" height="22" fill="#5F5E5A" rx="3"/><line x1="120" y1="140" x2="105" y2="200" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="140" x2="135" y2="200" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><path d="M 75 90 Q 75 120 75 150" stroke="#EF9F27" stroke-width="2" fill="none" stroke-dasharray="3,3"/><polygon points="75,150 72,144 78,144" fill="#EF9F27" transform="rotate(180 75 147)"/><path d="M 165 90 Q 165 120 165 150" stroke="#EF9F27" stroke-width="2" fill="none" stroke-dasharray="3,3"/><polygon points="165,150 162,144 168,144" fill="#EF9F27" transform="rotate(180 165 147)"/></svg>`,
+
+  triceps: `<svg viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg"><line x1="20" y1="20" x2="220" y2="20" stroke="#888" stroke-width="3"/><path d="M 120 25 Q 115 90 110 130" stroke="#E24B4A" stroke-width="3" fill="none" stroke-dasharray="5,3"/><circle cx="120" cy="60" r="14" fill="#1D9E75"/><line x1="120" y1="74" x2="120" y2="160" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="90" x2="105" y2="120" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="105" y1="120" x2="110" y2="135" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="160" x2="105" y2="210" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="160" x2="135" y2="210" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><path d="M 95 130 L 80 145" stroke="#EF9F27" stroke-width="2" fill="none"/><polygon points="80,145 86,142 84,150" fill="#EF9F27"/></svg>`,
+
+  prancha: `<svg viewBox="0 0 280 140" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="120" x2="270" y2="120" stroke="#888" stroke-width="2"/><circle cx="50" cy="65" r="11" fill="#1D9E75"/><line x1="60" y1="68" x2="220" y2="85" stroke="#1D9E75" stroke-width="5" stroke-linecap="round"/><line x1="55" y1="70" x2="55" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="55" y1="100" x2="75" y2="115" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="220" y1="85" x2="245" y2="115" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="220" y1="85" x2="240" y2="115" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="80" y1="65" x2="80" y2="115" stroke="#888" stroke-width="2" stroke-dasharray="2,3"/><line x1="200" y1="80" x2="200" y2="115" stroke="#888" stroke-width="2" stroke-dasharray="2,3"/><text x="140" y="50" font-family="sans-serif" font-size="12" fill="#888" text-anchor="middle">corpo reto</text></svg>`,
+
+  abdominal: `<svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg"><line x1="20" y1="160" x2="220" y2="160" stroke="#888" stroke-width="2"/><circle cx="170" cy="100" r="12" fill="#1D9E75"/><path d="M 170 110 Q 140 130 110 145" stroke="#1D9E75" stroke-width="4" fill="none" stroke-linecap="round"/><line x1="110" y1="145" x2="50" y2="155" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="155" x2="60" y2="125" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="60" y1="125" x2="50" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="160" y1="105" x2="135" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="160" y1="105" x2="145" y2="115" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><path d="M 175 125 Q 195 145 175 160" stroke="#EF9F27" stroke-width="2" fill="none" stroke-dasharray="3,2"/><polygon points="175,160 172,154 178,154" fill="#EF9F27"/></svg>`,
+
+  rosca: `<svg viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg"><circle cx="120" cy="40" r="14" fill="#1D9E75"/><line x1="120" y1="54" x2="120" y2="140" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="80" x2="95" y2="120" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="95" y1="120" x2="100" y2="80" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="80" x2="145" y2="120" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="145" y1="120" x2="140" y2="80" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><rect x="88" y="68" width="20" height="22" fill="#5F5E5A" rx="3"/><rect x="132" y="68" width="20" height="22" fill="#5F5E5A" rx="3"/><line x1="120" y1="140" x2="105" y2="200" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="140" x2="135" y2="200" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><path d="M 80 110 Q 75 90 85 70" stroke="#EF9F27" stroke-width="2" fill="none" stroke-dasharray="3,3"/><polygon points="85,70 79,73 84,77" fill="#EF9F27"/></svg>`,
+
+  puxada: `<svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg"><rect x="115" y="10" width="10" height="40" fill="#888" rx="2"/><line x1="120" y1="50" x2="100" y2="90" stroke="#E24B4A" stroke-width="3" stroke-dasharray="5,3"/><line x1="120" y1="50" x2="140" y2="90" stroke="#E24B4A" stroke-width="3" stroke-dasharray="5,3"/><circle cx="120" cy="120" r="14" fill="#1D9E75"/><line x1="120" y1="134" x2="120" y2="200" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="140" x2="100" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="140" x2="140" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="200" x2="105" y2="230" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="200" x2="135" y2="230" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><path d="M 80 120 Q 75 145 105 145" stroke="#EF9F27" stroke-width="2" fill="none" stroke-dasharray="3,2"/><polygon points="105,145 99,142 99,148" fill="#EF9F27"/></svg>`,
+
+  bent_over: `<svg viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="200" x2="270" y2="200" stroke="#888" stroke-width="2"/><circle cx="80" cy="90" r="12" fill="#1D9E75"/><line x1="92" y1="90" x2="180" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="180" y1="100" x2="180" y2="160" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="180" y1="160" x2="160" y2="195" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="180" y1="160" x2="200" y2="195" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="130" y1="95" x2="130" y2="60" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="130" y1="60" x2="115" y2="55" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="155" y1="98" x2="155" y2="60" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="155" y1="60" x2="170" y2="55" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><rect x="110" y="50" width="14" height="14" fill="#5F5E5A" rx="2"/><rect x="166" y="50" width="14" height="14" fill="#5F5E5A" rx="2"/><path d="M 105 70 Q 95 50 110 35" stroke="#EF9F27" stroke-width="2" fill="none" stroke-dasharray="3,2"/><polygon points="110,35 104,38 109,42" fill="#EF9F27"/></svg>`,
+
+  ponte: `<svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="140" x2="270" y2="140" stroke="#888" stroke-width="2"/><circle cx="50" cy="100" r="11" fill="#1D9E75"/><line x1="60" y1="98" x2="160" y2="80" stroke="#1D9E75" stroke-width="5" stroke-linecap="round"/><line x1="160" y1="80" x2="200" y2="135" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="200" y1="135" x2="220" y2="135" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="55" y1="105" x2="40" y2="135" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><path d="M 165 95 Q 175 110 165 130" stroke="#EF9F27" stroke-width="2" fill="none" stroke-dasharray="3,2"/><polygon points="170,77 175,80 165,83" fill="#EF9F27"/><path d="M 160 65 L 165 75" stroke="#EF9F27" stroke-width="2"/></svg>`,
+
+  abducao: `<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg"><rect x="60" y="50" width="160" height="60" fill="#5F5E5A" rx="6" opacity="0.5"/><circle cx="140" cy="40" r="14" fill="#1D9E75"/><line x1="140" y1="54" x2="140" y2="80" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="115" y1="115" x2="80" y2="155" stroke="#1D9E75" stroke-width="5" stroke-linecap="round"/><line x1="165" y1="115" x2="200" y2="155" stroke="#1D9E75" stroke-width="5" stroke-linecap="round"/><line x1="115" y1="115" x2="105" y2="140" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="165" y1="115" x2="175" y2="140" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><path d="M 105 130 Q 125 115 145 115 Q 165 115 175 130" stroke="#E24B4A" stroke-width="4" fill="none" stroke-dasharray="4,3"/><path d="M 90 145 L 70 165" stroke="#EF9F27" stroke-width="2"/><polygon points="70,165 76,162 76,168" fill="#EF9F27"/><path d="M 190 145 L 210 165" stroke="#EF9F27" stroke-width="2"/><polygon points="210,165 204,162 204,168" fill="#EF9F27"/></svg>`,
+
+  deadbug: `<svg viewBox="0 0 280 180" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="160" x2="270" y2="160" stroke="#888" stroke-width="2"/><circle cx="60" cy="135" r="11" fill="#1D9E75"/><line x1="71" y1="135" x2="180" y2="135" stroke="#1D9E75" stroke-width="5" stroke-linecap="round"/><line x1="80" y1="135" x2="50" y2="80" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="80" x2="55" y2="50" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="135" x2="115" y2="155" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="170" y1="135" x2="220" y2="100" stroke="#1D9E75" stroke-width="5" stroke-linecap="round"/><line x1="220" y1="100" x2="245" y2="80" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="180" y1="135" x2="195" y2="155" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><text x="140" y="30" font-family="sans-serif" font-size="11" fill="#888" text-anchor="middle">braço e perna OPOSTOS</text></svg>`,
+
+  caminhada: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="180" x2="230" y2="180" stroke="#888" stroke-width="2"/><circle cx="100" cy="50" r="13" fill="#1D9E75"/><line x1="100" y1="63" x2="100" y2="120" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="80" x2="75" y2="105" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="80" x2="125" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="125" y1="100" x2="135" y2="125" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="120" x2="80" y2="170" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="100" y1="120" x2="120" y2="155" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="155" x2="140" y2="170" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><path d="M 140 130 Q 170 130 200 125" stroke="#EF9F27" stroke-width="2" fill="none" stroke-dasharray="4,3"/><polygon points="200,125 192,121 192,128" fill="#EF9F27"/></svg>`,
+
+  bike: `<svg viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg"><circle cx="80" cy="170" r="30" fill="none" stroke="#5F5E5A" stroke-width="3"/><circle cx="200" cy="170" r="30" fill="none" stroke="#5F5E5A" stroke-width="3"/><line x1="80" y1="170" x2="200" y2="170" stroke="#5F5E5A" stroke-width="3"/><line x1="140" y1="170" x2="140" y2="100" stroke="#5F5E5A" stroke-width="3"/><line x1="140" y1="100" x2="170" y2="80" stroke="#5F5E5A" stroke-width="3"/><line x1="140" y1="100" x2="115" y2="80" stroke="#5F5E5A" stroke-width="3"/><circle cx="160" cy="60" r="13" fill="#1D9E75"/><line x1="160" y1="73" x2="155" y2="115" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="155" y1="115" x2="140" y2="170" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="155" y1="115" x2="170" y2="155" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="160" y1="80" x2="180" y2="90" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="180" y1="90" x2="170" y2="80" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/></svg>`,
+
+  alongamento: `<svg viewBox="0 0 280 180" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="160" x2="270" y2="160" stroke="#888" stroke-width="2"/><circle cx="50" cy="135" r="11" fill="#1D9E75"/><line x1="60" y1="135" x2="120" y2="135" stroke="#1D9E75" stroke-width="5" stroke-linecap="round"/><line x1="120" y1="135" x2="180" y2="65" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="180" y1="65" x2="180" y2="40" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="135" x2="160" y2="155" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="65" y1="125" x2="80" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="80" y1="100" x2="180" y2="50" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><circle cx="180" cy="40" r="6" fill="#5F5E5A"/></svg>`,
+
+  respiracao: `<svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="160" x2="230" y2="160" stroke="#888" stroke-width="2"/><circle cx="60" cy="135" r="11" fill="#1D9E75"/><line x1="71" y1="135" x2="190" y2="135" stroke="#1D9E75" stroke-width="5" stroke-linecap="round"/><line x1="100" y1="125" x2="115" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><circle cx="120" cy="120" r="20" fill="none" stroke="#EF9F27" stroke-width="2" stroke-dasharray="4,3"/><circle cx="120" cy="120" r="32" fill="none" stroke="#EF9F27" stroke-width="2" stroke-dasharray="4,3" opacity="0.6"/><text x="120" y="55" font-family="sans-serif" font-size="11" fill="#888" text-anchor="middle">barriga sobe e desce</text></svg>`
+};
+
+const TRAININGS = {
+  'A': {
+    name: 'Treino A — Empurrar e core',
+    subtitle: 'Peito, ombros, tríceps e core',
+    type: 'forca',
+    warning: 'Hipertensão: nunca prenda o ar. Solte o ar quando empurrar, puxe o ar quando voltar.',
+    exercises: [
+      { id: 'a1', name: 'Marcha no lugar com braços (aquecimento)', sets: '7 minutos', icon: 'marcha',
+        how: 'Marche no lugar elevando bem os joelhos e mexendo os braços. Aumente o ritmo gradualmente.',
+        steps: ['Comece em ritmo lento nos primeiros 2 minutos', 'Aumente para ritmo médio nos próximos 3 minutos', 'Eleve mais os joelhos (até a altura do quadril) nos últimos 2 minutos', 'Mexa os braços naturalmente, alternando com as pernas', 'Mantenha um ritmo onde ainda consegue conversar'],
+        tip: 'O objetivo é aquecer e elevar levemente a frequência cardíaca antes do treino de força.' },
+
+      { id: 'a2', name: 'Flexão de braço no apoio', sets: '4 séries de 10 repetições', icon: 'flexao',
+        how: 'Apoie as mãos no apoio para flexões. Joelhos no chão se necessário, ou pés se conseguir.',
+        steps: ['Posicione o apoio no chão na largura dos ombros', 'Apoie os joelhos (versão fácil) ou os pés (versão completa)', 'Mantenha o corpo reto da cabeça aos joelhos ou calcanhares', 'Desça o peito em 3 segundos até quase tocar o chão', 'Empurre para subir em 2 segundos, soltando o ar'],
+        tip: 'Se 10 estiver fácil, faça 12 ou 15. Se difícil, faça quantas conseguir mantendo a forma.',
+        danger: 'Não desça se sentir dor no ombro. Tente a versão com apoio mais alto na parede.' },
+
+      { id: 'a3', name: 'Remada com elástico na parede', sets: '4 séries de 15 repetições', icon: 'remada',
+        how: 'Prenda o elástico na parede na altura do peito. Puxe na direção do umbigo com força.',
+        steps: ['Prenda o elástico em um suporte na parede, altura do peito', 'Em pé, joelhos levemente flexionados, postura firme', 'Estenda os braços segurando as pontas do elástico', 'Puxe os cotovelos para trás com força, juntando as omoplatas', 'Segure 1 segundo na contração e volte controlado em 3 segundos'],
+        tip: 'Aperte bem as omoplatas no final. Se estiver fácil, afaste mais da parede para aumentar a tensão.' },
+
+      { id: 'a4', name: 'Desenvolvimento com halteres', sets: '4 séries de 10 repetições', icon: 'rosca',
+        how: 'Sentado ou em pé, halteres na altura dos ombros. Empurre acima da cabeça.',
+        steps: ['Sente em uma cadeira com encosto firme (mais seguro para a coluna)', 'Halteres de 6 a 8 kg em cada mão, na altura dos ombros', 'Cotovelos a 90 graus, palmas viradas para frente', 'Empurre os halteres para cima até quase estender os braços', 'Solte o ar enquanto sobe, desça controlado em 3 segundos'],
+        tip: 'Não trave os cotovelos no topo. Mantenha sempre uma leve flexão.',
+        danger: 'CUIDADO com a pressão arterial. Solte o ar enquanto empurra para cima.' },
+
+      { id: 'a5', name: 'Elevação lateral com halteres', sets: '4 séries de 12 repetições', icon: 'elev_lateral',
+        how: 'Use halteres de 4 a 6 kg. Eleve os braços para o lado até a altura dos ombros.',
+        steps: ['Em pé com um halter em cada mão, ao lado do corpo', 'Cotovelos levemente flexionados', 'Eleve os braços para o lado até a altura dos ombros', 'Não passe da linha do ombro', 'Desça controlado em 3 segundos'],
+        tip: 'O ombro prefere repetições controladas. Se o halter balançar, está pesado demais.' },
+
+      { id: 'a6', name: 'Tríceps com superband', sets: '4 séries de 15 repetições', icon: 'triceps',
+        how: 'Prenda a superband em um ponto alto. Puxe para baixo mantendo o cotovelo fixo.',
+        steps: ['Prenda o elástico em um ponto acima da cabeça', 'Em pé, segure a ponta com as duas mãos', 'Cotovelos colados ao corpo, não devem se mover', 'Estenda os braços para baixo, esticando os cotovelos', 'Aperte o tríceps no final, volte controlado'],
+        tip: 'Cotovelo é o eixo. Apenas o antebraço se move. Se fácil, afaste mais para aumentar tensão.' },
+
+      { id: 'a7', name: 'Prancha frontal', sets: '3 séries de 30 segundos', icon: 'prancha',
+        how: 'Apoie os antebraços e os pés no chão. Corpo reto, barriga contraída.',
+        steps: ['Deite de bruços', 'Apoie os antebraços no chão, cotovelos abaixo dos ombros', 'Levante o corpo apoiado nos antebraços e pés', 'Corpo reto da cabeça aos calcanhares', 'Contraia a barriga e o glúteo, segure 30 segundos respirando normalmente'],
+        tip: 'Se 30 segundos for muito, faça 20. Se fácil, vá para 45 segundos.',
+        danger: 'NUNCA prenda o ar. Respire normalmente durante o exercício.' },
+
+      { id: 'a8', name: 'Abdominal supra (crunch)', sets: '4 séries de 20 repetições', icon: 'abdominal',
+        how: 'Deitado de costas, joelhos flexionados. Levante a parte alta das costas com força.',
+        steps: ['Deite de costas com joelhos dobrados, pés no chão', 'Mãos atrás da cabeça, sem puxá-la', 'Levante a parte alta das costas, soltando o ar', 'Aperte o abdômen no topo do movimento', 'Desça controlado, sem deixar a cabeça cair'],
+        tip: 'Movimento curto e contraído. Foque em apertar o abdômen, não em chegar perto do joelho.' },
+
+      { id: 'a9', name: 'Alongamento e respiração final', sets: '6 minutos', icon: 'respiracao',
+        how: 'Alongue peito, ombros e tríceps. Termine com respiração diafragmática.',
+        steps: ['Alongue o peito (mãos atrás da nuca, abrir cotovelos): 30 segundos', 'Alongue cada ombro cruzando o braço no peito: 30 segundos cada', 'Alongue cada tríceps puxando o cotovelo atrás da cabeça: 30 segundos cada', 'Deite de costas, mão na barriga', 'Respire fundo 10 vezes, sentindo a barriga subir e descer'],
+        tip: 'A respiração diafragmática ajuda a controlar a pressão arterial após o exercício.' }
+    ]
+  },
+
+  'B': {
+    name: 'Treino B — Puxar e pernas',
+    subtitle: 'Bíceps, costas, glúteo, pernas e core',
+    type: 'forca',
+    warning: 'Joelho sensível: nunca passe dos 90 graus de flexão. Se sentir dor, pare imediatamente.',
+    exercises: [
+      { id: 'b1', name: 'Marcha + rotação de ombros (aquecimento)', sets: '7 minutos', icon: 'marcha',
+        how: 'Marche no lugar fazendo movimentos circulares com os ombros e braços.',
+        steps: ['Marche no lugar nos primeiros 2 minutos em ritmo médio', 'Faça círculos para trás com os ombros nos próximos 2 minutos', 'Faça círculos para frente nos próximos 2 minutos', 'No último minuto, eleve e abaixe os braços lateralmente'],
+        tip: 'Movimente todas as articulações dos ombros para preparar para os exercícios de costas.' },
+
+      { id: 'b2', name: 'Rosca direta com halteres', sets: '4 séries de 12 repetições', icon: 'rosca',
+        how: 'Em pé, com halteres de 8 a 10 kg. Flexione os cotovelos com força.',
+        steps: ['Em pé, halter em cada mão, braços estendidos', 'Cotovelos colados na lateral do corpo, não devem se mover', 'Flexione os cotovelos subindo o halter até a altura dos ombros', 'Aperte o bíceps no topo do movimento', 'Desça controlado em 3 segundos'],
+        tip: 'Cotovelo fixo. Se balançar o tronco, o peso está pesado demais.' },
+
+      { id: 'b3', name: 'Puxada alta com superband', sets: '4 séries de 15 repetições', icon: 'puxada',
+        how: 'Prenda a superband em um ponto alto. Puxe para baixo na frente do peito com força.',
+        steps: ['Prenda o elástico bem alto, em batente da porta ou suporte', 'Sente em uma cadeira ou ajoelhe no chão', 'Segure as duas pontas com os braços estendidos para cima', 'Puxe trazendo as mãos até a frente do peito', 'Junte as omoplatas com força no final do movimento'],
+        tip: 'Imagine que está colocando os cotovelos no bolso de trás da calça.' },
+
+      { id: 'b4', name: 'Remada curvada com halteres', sets: '4 séries de 12 repetições', icon: 'bent_over',
+        how: 'Inclinado para frente com halteres. Puxe os halteres em direção ao quadril.',
+        steps: ['Em pé, halteres de 8 a 10 kg em cada mão', 'Incline o tronco para frente em 45 graus, costas retas', 'Joelhos levemente flexionados, halteres pendurados', 'Puxe os halteres em direção ao quadril, juntando as omoplatas', 'Desça controlado em 3 segundos'],
+        tip: 'Costas retas. Se a coluna arredondar, alivie o peso ou faça menos repetições.',
+        danger: 'Se sentir dor lombar, faça sentado em uma cadeira inclinado para frente.' },
+
+      { id: 'b5', name: 'Ponte de glúteo', sets: '4 séries de 20 repetições', icon: 'ponte',
+        how: 'Deitado de costas, joelhos dobrados. Eleve o quadril com força contraindo o glúteo.',
+        steps: ['Deite de costas, joelhos dobrados em 90 graus, pés no chão', 'Braços ao lado do corpo', 'Eleve o quadril contraindo o glúteo com força, soltando o ar', 'Linha reta entre joelhos, quadril e ombros no topo', 'Aperte o glúteo por 2 segundos no topo, desça controlado'],
+        tip: 'Sinta o glúteo trabalhando, não a lombar. O segredo é apertar bem no topo do movimento.' },
+
+      { id: 'b6', name: 'Ponte de glúteo com peso', sets: '3 séries de 15 repetições', icon: 'ponte',
+        how: 'Mesma ponte de glúteo, mas com um halter (10 kg) sobre o quadril.',
+        steps: ['Deite de costas como na ponte normal', 'Coloque um halter de 8 a 12 kg sobre o quadril, segurando com as mãos', 'Eleve o quadril com força, soltando o ar', 'Aperte o glúteo no topo por 2 segundos', 'Desça controlado'],
+        tip: 'Esse é o exercício de pernas mais seguro para joelho problemático. Trabalha glúteo e isquiotibiais.' },
+
+      { id: 'b7', name: 'Abdução com miniband sentado', sets: '4 séries de 20 repetições', icon: 'abducao',
+        how: 'Sentado em uma cadeira, com a miniband acima dos joelhos. Abra as pernas com força.',
+        steps: ['Sentado em uma cadeira, costas retas', 'Miniband logo acima dos joelhos', 'Pés afastados na largura do quadril', 'Abra os joelhos com força contra a resistência do elástico', 'Aperte o glúteo lateral, volte controlado'],
+        tip: 'Esse exercício fortalece o glúteo médio, que protege e estabiliza o joelho.' },
+
+      { id: 'b8', name: 'Dead bug (core profundo)', sets: '4 séries de 12 repetições', icon: 'deadbug',
+        how: 'Deitado de costas com braços e pernas no ar. Estique braço e perna OPOSTOS.',
+        steps: ['Deite de costas, braços apontados para o teto', 'Joelhos e quadris dobrados em 90 graus, no ar', 'Estenda lentamente o braço direito para trás e a perna esquerda para frente', 'Mantenha a lombar colada no chão', 'Volte e alterne para o outro lado (cada lado conta como 1 repetição)'],
+        tip: 'Movimento lento e controlado. A qualidade vale mais que a velocidade.',
+        danger: 'A lombar precisa ficar colada no chão sempre. Se arquear, diminua a amplitude.' },
+
+      { id: 'b9', name: 'Alongamento e respiração final', sets: '6 minutos', icon: 'alongamento',
+        how: 'Alongue isquiotibiais, glúteo e coluna. Termine com respiração diafragmática.',
+        steps: ['Sente no chão com uma perna estendida e outra dobrada', 'Tente alcançar o pé da perna estendida (joelho semi-flexionado): 30 segundos cada lado', 'Deitado, abrace os dois joelhos no peito por 30 segundos', 'Cruze um joelho sobre o outro deitado para alongar o glúteo: 30 segundos cada lado', 'Deite e faça 10 respirações diafragmáticas profundas'],
+        tip: 'Não force o alongamento. Vá até onde a perna permite sem dor.' }
+    ]
+  },
+
+  'C': {
+    name: 'Treino C — Cardio leve',
+    subtitle: 'Cardiovascular de baixo impacto',
+    type: 'cardio',
+    warning: 'Frequência cardíaca alvo: 85 a 110 batimentos por minuto. Se passar disso, diminua o ritmo.',
+    exercises: [
+      { id: 'c1', name: 'Caminhada ou bicicleta', sets: '40 a 45 minutos', icon: 'caminhada',
+        how: 'Cardio contínuo de baixo impacto. Caminhada ou bicicleta ergométrica.',
+        steps: ['Use tênis com bom amortecimento se for caminhar', 'Comece devagar nos primeiros 5 minutos para aquecer', 'Aumente para um ritmo moderado onde consegue falar mas não cantar', 'Mantenha esse ritmo por 30 a 35 minutos', 'Termine com 5 minutos mais lento para resfriar'],
+        tip: 'Se estiver fácil, aumente o ritmo. Se for caminhada, pode incluir uma leve subida nos minutos centrais.' },
+
+      { id: 'c2', name: 'Caminhada com mudança de ritmo (alternativa)', sets: '30 a 35 minutos', icon: 'caminhada',
+        how: 'Alterne 2 minutos em ritmo médio com 1 minuto em ritmo mais forte.',
+        steps: ['Aqueça em ritmo lento por 5 minutos', 'Caminhe 2 minutos em ritmo médio', 'Acelere para ritmo forte (mas sem correr) por 1 minuto', 'Volte ao ritmo médio por 2 minutos', 'Repita o ciclo por 25 minutos, termine com 5 minutos lento'],
+        tip: 'Esse formato queima mais gordura que o ritmo contínuo. Faça 1 vez por semana, no máximo.' },
+
+      { id: 'c3', name: 'Alongamento e respiração final', sets: '5 minutos', icon: 'respiracao',
+        how: 'Alongue panturrilha, isquiotibiais e quadríceps. Termine com respiração.',
+        steps: ['Alongue cada panturrilha por 30 segundos', 'Alongue isquiotibiais com joelho semi-flexionado: 30 segundos cada lado', 'Alongue quadríceps puxando o pé para o glúteo (apoie em uma parede): 30 segundos cada lado', 'Faça 10 respirações profundas em pé ou deitado'],
+        tip: 'O alongamento pós-cardio reduz o cansaço no dia seguinte e a sensação de pernas pesadas.' }
+    ]
+  },
+
+  'D': {
+    name: 'Recuperação ativa',
+    subtitle: 'Movimento leve para recuperar o corpo',
+    type: 'recuperacao',
+    warning: 'Hoje é dia leve. Movimento sem stress acelera a recuperação muscular.',
+    exercises: [
+      { id: 'd1', name: 'Caminhada leve', sets: '25 minutos', icon: 'caminhada',
+        how: 'Caminhada bem leve, ritmo de passeio, sem inclinação.',
+        steps: ['Saia para caminhar em ritmo de passeio', 'Pode ser no bairro, parque ou em esteira', 'Mantenha um ritmo onde consegue cantar tranquilo', 'Não precisa elevar muito a frequência cardíaca'],
+        tip: 'Hoje é leveza. Sem competir com você mesmo. O objetivo é circulação, não treino.' },
+
+      { id: 'd2', name: 'Mobilidade de quadril', sets: '10 minutos', icon: 'alongamento',
+        how: 'Movimentos circulares e alongamentos para o quadril.',
+        steps: ['Deite de costas, joelhos dobrados', 'Faça 10 círculos com cada joelho para fora', 'Cruze o tornozelo no joelho oposto (figura 4) e segure 30 segundos cada lado', 'Abrace os dois joelhos no peito por 30 segundos', 'Faça rotações suaves com os joelhos juntos'],
+        tip: 'Quadril livre alivia a carga no joelho ao longo do dia.' },
+
+      { id: 'd3', name: 'Alongamento global suave', sets: '10 minutos', icon: 'alongamento',
+        how: 'Alongue peito, ombros, lombar e isquiotibiais. Sempre com joelho semi-flexionado.',
+        steps: ['Alongamento de peito (mãos atrás da nuca, abrir cotovelos): 30 segundos', 'Alongamento de ombros (braço cruzado no peito): 30 segundos cada lado', 'Alongamento de lombar (joelhos no peito deitado): 30 segundos', 'Alongamento de isquiotibial (joelho semi-flexionado): 30 segundos cada lado', 'Alongamento de panturrilha em pé apoiado na parede: 30 segundos cada lado'],
+        tip: 'Sem dor. Apenas até sentir o músculo distendido.' },
+
+      { id: 'd4', name: 'Respiração consciente', sets: '10 minutos', icon: 'respiracao',
+        how: 'Respiração diafragmática deitado, focada em relaxar.',
+        steps: ['Deite confortável em um lugar tranquilo', 'Mão na barriga e outra no peito', 'Inspire pelo nariz fazendo a barriga subir (4 segundos)', 'Segure 2 segundos', 'Solte o ar pela boca devagar (6 segundos)', 'Repita por 10 minutos'],
+        tip: 'Reduz cortisol, melhora o sono e auxilia o controle da pressão arterial.' }
+    ]
+  }
+};
+
+const WEEK_PLAN = ['A', 'B', 'C', 'D', 'D', 'A', 'B'];
+const DAY_NAMES = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
+
+function getStorageData() {
+  try {
+    const raw = localStorage.getItem('treinoEdgard');
+    if (!raw) return { history: {}, completed: {} };
+    return JSON.parse(raw);
+  } catch (e) {
+    return { history: {}, completed: {} };
+  }
+}
+
+function saveStorageData(data) {
+  try {
+    localStorage.setItem('treinoEdgard', JSON.stringify(data));
+  } catch (e) { console.error(e); }
+}
+
+function getDateKey(d) {
+  const yr = d.getFullYear();
+  const mo = String(d.getMonth() + 1).padStart(2, '0');
+  const dy = String(d.getDate()).padStart(2, '0');
+  return `${yr}-${mo}-${dy}`;
+}
+
+function formatDateBr(d) {
+  const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  return `${d.getDate()} de ${months[d.getMonth()]} de ${d.getFullYear()}`;
+}
+
+function getWeekDates() {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const monday = new Date(today);
+  const offset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  monday.setDate(today.getDate() + offset);
+  const dates = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    dates.push(d);
+  }
+  return dates;
+}
+
+function getTrainingForDate(d) {
+  const dayOfWeek = d.getDay();
+  const map = [6, 0, 1, 2, 3, 4, 5];
+  return WEEK_PLAN[map[dayOfWeek]];
+}
+
+let currentDate = new Date();
+let activeView = 'today';
+
+function renderHeader() {
+  const today = new Date();
+  document.getElementById('header-date').textContent = formatDateBr(today);
+}
+
+function renderStats() {
+  const data = getStorageData();
+  const history = data.history || {};
+  const today = new Date();
+
+  const completedDates = Object.keys(history).sort();
+  const totalCount = completedDates.length;
+
+  let streak = 0;
+  let checkDate = new Date(today);
+  while (true) {
+    const key = getDateKey(checkDate);
+    if (history[key]) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else {
+      const trainingType = getTrainingForDate(checkDate);
+      if (trainingType === 'rest' && getDateKey(checkDate) !== getDateKey(today)) {
+        checkDate.setDate(checkDate.getDate() - 1);
+        continue;
+      }
+      break;
+    }
+  }
+
+  const weekDates = getWeekDates();
+  let weekDone = 0;
+  let weekTotal = 0;
+  weekDates.forEach(d => {
+    const t = getTrainingForDate(d);
+    if (t !== 'rest') {
+      weekTotal++;
+      if (history[getDateKey(d)]) weekDone++;
+    }
+  });
+
+  document.getElementById('stat-streak').textContent = streak;
+  document.getElementById('stat-total').textContent = totalCount;
+  document.getElementById('stat-week').textContent = `${weekDone}/${weekTotal}`;
+}
+
+function renderDayGrid() {
+  const grid = document.getElementById('day-grid');
+  const data = getStorageData();
+  const dates = getWeekDates();
+  const todayKey = getDateKey(new Date());
+  const currentKey = getDateKey(currentDate);
+
+  grid.innerHTML = '';
+  dates.forEach((d) => {
+    const dayName = DAY_NAMES[d.getDay()];
+    const key = getDateKey(d);
+    const trainingType = getTrainingForDate(d);
+    const isCompleted = !!(data.history && data.history[key]);
+    const isToday = key === todayKey;
+    const isActive = key === currentKey;
+    const isRest = trainingType === 'rest';
+
+    const btn = document.createElement('button');
+    btn.className = 'day-btn';
+    if (isActive) btn.classList.add('active');
+    if (isCompleted) btn.classList.add('completed');
+    if (isRest) btn.classList.add('rest');
+
+    btn.innerHTML = `
+      <div class="day-name">${dayName}${isToday ? ' (hoje)' : ''}</div>
+      <div class="day-num">${d.getDate()}</div>
+      <div class="day-dot"></div>
+    `;
+    btn.addEventListener('click', () => {
+      currentDate = d;
+      renderTrainingArea();
+      renderDayGrid();
+    });
+    grid.appendChild(btn);
+  });
+}
+
+function renderTrainingArea() {
+  const area = document.getElementById('training-area');
+  const trainingType = getTrainingForDate(currentDate);
+  const dateKey = getDateKey(currentDate);
+  const data = getStorageData();
+  const isCompleted = !!(data.history && data.history[dateKey]);
+
+  if (trainingType === 'rest') {
+    area.innerHTML = `
+      <div class="rest-day-card">
+        <div class="icon-circle">●</div>
+        <h3>Dia de descanso</h3>
+        <p>Hoje é descanso completo. Beba bastante água e durma bem. Amanhã treinamos de novo.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const training = TRAININGS[trainingType];
+  const completedExercises = (data.completed && data.completed[dateKey]) || {};
+  const totalEx = training.exercises.length;
+  const doneEx = Object.values(completedExercises).filter(v => v).length;
+  const progressPct = Math.round((doneEx / totalEx) * 100);
+
+  let html = `
+    <div class="training-info-card">
+      <div class="training-title">${training.name}</div>
+      <div class="training-subtitle">${training.subtitle}</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" style="width: ${progressPct}%"></div>
+      </div>
+      <div class="progress-text">
+        <span>${doneEx} de ${totalEx} exercícios</span>
+        <span>${progressPct}%</span>
+      </div>
+    </div>
+
+    <div class="warning-box"><strong>Atenção:</strong> ${training.warning}</div>
+
+    <div class="exercise-list">
+  `;
+
+  training.exercises.forEach((ex, idx) => {
+    const isDone = !!completedExercises[ex.id];
+    const stepsHtml = ex.steps.map(s => `<li>${s}</li>`).join('');
+    html += `
+      <div class="exercise-card ${isDone ? 'done' : ''}" data-id="${ex.id}">
+        <div class="exercise-header">
+          <div class="exercise-checkbox" onclick="toggleExercise('${ex.id}', event)">
+            <span class="checkmark">✓</span>
+          </div>
+          <div class="exercise-info" onclick="toggleExpand('${ex.id}')">
+            <div class="exercise-name">${idx + 1}. ${ex.name}</div>
+            <div class="exercise-meta"><span class="badge">${ex.sets}</span></div>
+          </div>
+          <button class="expand-btn" onclick="toggleExpand('${ex.id}')">
+            <span class="expand-icon">▾</span>
+          </button>
+        </div>
+        <div class="exercise-detail">
+          <div class="exercise-svg-container">${SVG_FIGURES[ex.icon] || ''}</div>
+          <div class="detail-section">
+            <div class="detail-label">Como fazer</div>
+            <div class="detail-text">${ex.how}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label">Passo a passo</div>
+            <div class="detail-text"><ol>${stepsHtml}</ol></div>
+          </div>
+          ${ex.tip ? `<div class="tip-box"><strong>Dica:</strong> ${ex.tip}</div>` : ''}
+          ${ex.danger ? `<div class="danger-box"><strong>Cuidado:</strong> ${ex.danger}</div>` : ''}
+        </div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+
+  if (!isCompleted) {
+    const allDone = doneEx === totalEx;
+    html += `
+      <button class="complete-btn" onclick="completeTraining()" ${allDone ? '' : 'disabled'}>
+        ${allDone ? 'Marcar treino como concluído' : `Faltam ${totalEx - doneEx} exercícios`}
+      </button>
+    `;
+  } else {
+    html += `<button class="complete-btn" disabled style="background: var(--green-100); color: var(--green-700);">Treino concluído ✓</button>`;
+  }
+
+  area.innerHTML = html;
+}
+
+window.toggleExpand = function(id) {
+  const card = document.querySelector(`[data-id="${id}"]`);
+  if (card) card.classList.toggle('expanded');
+};
+
+window.toggleExercise = function(id, event) {
+  if (event) event.stopPropagation();
+  const data = getStorageData();
+  const dateKey = getDateKey(currentDate);
+  if (!data.completed) data.completed = {};
+  if (!data.completed[dateKey]) data.completed[dateKey] = {};
+  data.completed[dateKey][id] = !data.completed[dateKey][id];
+  saveStorageData(data);
+  renderTrainingArea();
+};
+
+window.completeTraining = function() {
+  const data = getStorageData();
+  const dateKey = getDateKey(currentDate);
+  if (!data.history) data.history = {};
+  const trainingType = getTrainingForDate(currentDate);
+  data.history[dateKey] = {
+    type: trainingType,
+    name: TRAININGS[trainingType].name,
+    completedAt: new Date().toISOString()
+  };
+  saveStorageData(data);
+
+  const messages = [
+    'Mais um treino na conta. O corpo agradece!',
+    'Excelente! A consistência é o segredo.',
+    'Treino concluído. Cada dia conta.',
+    'Mais um dia mais forte. Continue assim!',
+    'Parabéns pela disciplina!'
+  ];
+  document.getElementById('modal-message').textContent = messages[Math.floor(Math.random() * messages.length)];
+  document.getElementById('modal').classList.add('show');
+  renderTrainingArea();
+  renderStats();
+  renderDayGrid();
+};
+
+window.closeModal = function() {
+  document.getElementById('modal').classList.remove('show');
+};
+
+window.switchView = function(view, btn) {
+  activeView = view;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-bottom').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (view === 'history') renderHistory();
+};
+
+function renderHistory() {
+  const data = getStorageData();
+  const history = data.history || {};
+  const list = document.getElementById('history-list');
+  const entries = Object.entries(history).sort((a, b) => b[0].localeCompare(a[0]));
+
+  if (entries.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div style="font-size: 32px; margin-bottom: 8px;">○</div>
+        <p>Nenhum treino concluído ainda.<br>Comece hoje!</p>
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = entries.map(([dateKey, info]) => {
+    const [yr, mo, dy] = dateKey.split('-');
+    const d = new Date(parseInt(yr), parseInt(mo) - 1, parseInt(dy));
+    const dayName = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][d.getDay()];
+    return `
+      <div class="history-item">
+        <div>
+          <div class="date">${dayName}, ${dy}/${mo}/${yr}</div>
+          <div class="training-name">${info.name}</div>
+        </div>
+        <div class="stat">✓</div>
+      </div>
+    `;
+  }).join('');
+}
+
+window.resetData = function() {
+  if (confirm('Tem certeza? Isso apagará todo o histórico de treinos.')) {
+    localStorage.removeItem('treinoEdgard');
+    location.reload();
+  }
+};
+
+renderHeader();
+renderStats();
+renderDayGrid();
+renderTrainingArea();
+</script>
+</body>
+</html>
