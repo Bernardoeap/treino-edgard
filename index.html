@@ -40,7 +40,7 @@ body {
   color: var(--gray-900);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  padding-bottom: 100px;
+  padding-bottom: 130px;
 }
 
 .container {
@@ -487,6 +487,71 @@ body {
   font-family: inherit;
 }
 
+.rest-timer-bar {
+  position: fixed;
+  bottom: 65px;
+  left: 0; right: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  padding: 10px 16px 10px;
+  display: none;
+  z-index: 49;
+  align-items: center;
+  gap: 12px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.rest-timer-bar.show { display: flex; }
+
+.rest-timer-bar .timer-label {
+  font-size: 12px;
+  color: var(--gray-400);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.rest-timer-bar .timer-count {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--green-700);
+  min-width: 38px;
+  text-align: center;
+}
+
+.rest-timer-bar .timer-count.urgent { color: var(--red-400); }
+
+.rest-timer-track {
+  flex: 1;
+  height: 6px;
+  background: var(--gray-100);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.rest-timer-fill {
+  height: 100%;
+  background: var(--green-400);
+  transition: width 1s linear;
+  border-radius: 4px;
+}
+
+.rest-timer-fill.urgent { background: var(--red-400); }
+
+.rest-timer-bar .timer-skip {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: var(--gray-400);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.rest-timer-bar .timer-skip:active { background: var(--gray-100); }
+
 .tabs-bottom {
   position: fixed;
   bottom: 0;
@@ -705,6 +770,15 @@ body {
   </button>
 </div>
 
+<div class="rest-timer-bar" id="rest-timer-bar">
+  <span class="timer-label">Descanso</span>
+  <span class="timer-count" id="timer-count">60</span>
+  <div class="rest-timer-track">
+    <div class="rest-timer-fill" id="timer-fill" style="width:100%"></div>
+  </div>
+  <button class="timer-skip" onclick="stopTimer()">Pular</button>
+</div>
+
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <div class="icon-circle">✓</div>
@@ -747,6 +821,8 @@ const SVG_FIGURES = {
   bike: `<svg viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg"><circle cx="80" cy="170" r="30" fill="none" stroke="#5F5E5A" stroke-width="3"/><circle cx="200" cy="170" r="30" fill="none" stroke="#5F5E5A" stroke-width="3"/><line x1="80" y1="170" x2="200" y2="170" stroke="#5F5E5A" stroke-width="3"/><line x1="140" y1="170" x2="140" y2="100" stroke="#5F5E5A" stroke-width="3"/><line x1="140" y1="100" x2="170" y2="80" stroke="#5F5E5A" stroke-width="3"/><line x1="140" y1="100" x2="115" y2="80" stroke="#5F5E5A" stroke-width="3"/><circle cx="160" cy="60" r="13" fill="#1D9E75"/><line x1="160" y1="73" x2="155" y2="115" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="155" y1="115" x2="140" y2="170" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="155" y1="115" x2="170" y2="155" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="160" y1="80" x2="180" y2="90" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="180" y1="90" x2="170" y2="80" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/></svg>`,
 
   alongamento: `<svg viewBox="0 0 280 180" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="160" x2="270" y2="160" stroke="#888" stroke-width="2"/><circle cx="50" cy="135" r="11" fill="#1D9E75"/><line x1="60" y1="135" x2="120" y2="135" stroke="#1D9E75" stroke-width="5" stroke-linecap="round"/><line x1="120" y1="135" x2="180" y2="65" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="180" y1="65" x2="180" y2="40" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="120" y1="135" x2="160" y2="155" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="65" y1="125" x2="80" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="80" y1="100" x2="180" y2="50" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><circle cx="180" cy="40" r="6" fill="#5F5E5A"/></svg>`,
+
+  remada_uni: `<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="155" width="70" height="12" fill="#5F5E5A" rx="4"/><line x1="40" y1="155" x2="40" y2="80" stroke="#5F5E5A" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="80" x2="100" y2="80" stroke="#5F5E5A" stroke-width="4" stroke-linecap="round"/><circle cx="130" cy="68" r="12" fill="#1D9E75"/><line x1="130" y1="80" x2="130" y2="155" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="130" y1="100" x2="100" y2="80" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="130" y1="155" x2="110" y2="190" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="130" y1="155" x2="155" y2="180" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="130" y1="100" x2="200" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><line x1="200" y1="100" x2="200" y2="140" stroke="#1D9E75" stroke-width="5" stroke-linecap="round"/><rect x="190" y="128" width="20" height="14" fill="#5F5E5A" rx="3"/><path d="M 200 140 Q 215 130 210 115" stroke="#EF9F27" stroke-width="2" fill="none" stroke-dasharray="3,2"/><polygon points="210,115 205,120 212,121" fill="#EF9F27"/></svg>`,
 
   respiracao: `<svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="160" x2="230" y2="160" stroke="#888" stroke-width="2"/><circle cx="60" cy="135" r="11" fill="#1D9E75"/><line x1="71" y1="135" x2="190" y2="135" stroke="#1D9E75" stroke-width="5" stroke-linecap="round"/><line x1="100" y1="125" x2="115" y2="100" stroke="#1D9E75" stroke-width="4" stroke-linecap="round"/><circle cx="120" cy="120" r="20" fill="none" stroke="#EF9F27" stroke-width="2" stroke-dasharray="4,3"/><circle cx="120" cy="120" r="32" fill="none" stroke="#EF9F27" stroke-width="2" stroke-dasharray="4,3" opacity="0.6"/><text x="120" y="55" font-family="sans-serif" font-size="11" fill="#888" text-anchor="middle">barriga sobe e desce</text></svg>`
 };
@@ -829,11 +905,11 @@ const TRAININGS = {
         steps: ['Prenda o elástico bem alto, em batente da porta ou suporte', 'Sente em uma cadeira ou ajoelhe no chão', 'Segure as duas pontas com os braços estendidos para cima', 'Puxe trazendo as mãos até a frente do peito', 'Junte as omoplatas com força no final do movimento'],
         tip: 'Imagine que está colocando os cotovelos no bolso de trás da calça.' },
 
-      { id: 'b4', name: 'Remada curvada com halteres', sets: '4 séries de 12 repetições', icon: 'bent_over',
-        how: 'Inclinado para frente com halteres. Puxe os halteres em direção ao quadril.',
-        steps: ['Em pé, halteres de 8 a 10 kg em cada mão', 'Incline o tronco para frente em 45 graus, costas retas', 'Joelhos levemente flexionados, halteres pendurados', 'Puxe os halteres em direção ao quadril, juntando as omoplatas', 'Desça controlado em 3 segundos'],
-        tip: 'Costas retas. Se a coluna arredondar, alivie o peso ou faça menos repetições.',
-        danger: 'Se sentir dor lombar, faça sentado em uma cadeira inclinado para frente.' },
+      { id: 'b4', name: 'Remada unilateral com halter', sets: '4 séries de 12 repetições (cada lado)', icon: 'remada_uni',
+        how: 'Apoie um joelho e a mão do mesmo lado em um banco ou cadeira. Com o outro braço, puxe o halter até o quadril.',
+        steps: ['Apoie o joelho direito e a mão direita numa cadeira firme', 'Halter de 8 a 12 kg na mão esquerda, braço estendido para baixo', 'Costas paralelas ao chão — corpo em L', 'Puxe o halter até o quadril, cotovelo rente ao corpo', 'Aperte a omoplata no topo por 1 segundo, desça controlado em 3 segundos', 'Complete as 12 repetições e troque de lado'],
+        tip: 'Essa versão protege muito mais a lombar do que a remada curvada. Você consegue usar mais peso com segurança.',
+        danger: 'Não gire o tronco para puxar. O movimento é só do braço, o tronco fica quieto.' },
 
       { id: 'b5', name: 'Ponte de glúteo', sets: '4 séries de 20 repetições', icon: 'ponte',
         how: 'Deitado de costas, joelhos dobrados. Eleve o quadril com força contraindo o glúteo.',
@@ -948,14 +1024,11 @@ function formatDateBr(d) {
 
 function getWeekDates() {
   const today = new Date();
-  const dayOfWeek = today.getDay();
-  const monday = new Date(today);
-  const offset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-  monday.setDate(today.getDate() + offset);
+  today.setHours(0, 0, 0, 0);
   const dates = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
+  for (let i = -3; i <= 3; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
     dates.push(d);
   }
   return dates;
@@ -1000,16 +1073,24 @@ function renderStats() {
     }
   }
 
-  const weekDates = getWeekDates();
+  // Conta treinos da semana calendário atual (seg-dom)
+  const today2 = new Date();
+  today2.setHours(0,0,0,0);
+  const dow = today2.getDay();
+  const monOffset = dow === 0 ? -6 : 1 - dow;
+  const weekStart = new Date(today2);
+  weekStart.setDate(today2.getDate() + monOffset);
   let weekDone = 0;
   let weekTotal = 0;
-  weekDates.forEach(d => {
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(weekStart);
+    d.setDate(weekStart.getDate() + i);
     const t = getTrainingForDate(d);
     if (t !== 'rest') {
       weekTotal++;
       if (history[getDateKey(d)]) weekDone++;
     }
-  });
+  }
 
   document.getElementById('stat-streak').textContent = streak;
   document.getElementById('stat-total').textContent = totalCount;
@@ -1145,6 +1226,52 @@ function renderTrainingArea() {
   area.innerHTML = html;
 }
 
+let timerInterval = null;
+let timerTotal = 0;
+let timerLeft = 0;
+
+function startRestTimer(seconds) {
+  stopTimer();
+  timerTotal = seconds;
+  timerLeft = seconds;
+  const bar = document.getElementById('rest-timer-bar');
+  const count = document.getElementById('timer-count');
+  const fill = document.getElementById('timer-fill');
+
+  bar.classList.add('show');
+  count.textContent = timerLeft;
+  count.className = 'timer-count';
+  fill.style.transition = 'none';
+  fill.style.width = '100%';
+  fill.className = 'rest-timer-fill';
+
+  // força reflow para a transition funcionar
+  fill.getBoundingClientRect();
+  fill.style.transition = `width ${timerLeft}s linear`;
+  fill.style.width = '0%';
+
+  timerInterval = setInterval(() => {
+    timerLeft--;
+    count.textContent = timerLeft;
+    if (timerLeft <= 10) {
+      count.className = 'timer-count urgent';
+      fill.className = 'rest-timer-fill urgent';
+    }
+    if (timerLeft <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      // vibração ao terminar (celular)
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      bar.classList.remove('show');
+    }
+  }, 1000);
+}
+
+window.stopTimer = function() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  document.getElementById('rest-timer-bar').classList.remove('show');
+};
+
 window.toggleExpand = function(id) {
   const card = document.querySelector(`[data-id="${id}"]`);
   if (card) card.classList.toggle('expanded');
@@ -1156,9 +1283,12 @@ window.toggleExercise = function(id, event) {
   const dateKey = getDateKey(currentDate);
   if (!data.completed) data.completed = {};
   if (!data.completed[dateKey]) data.completed[dateKey] = {};
-  data.completed[dateKey][id] = !data.completed[dateKey][id];
+  const wasUndone = !data.completed[dateKey][id];
+  data.completed[dateKey][id] = wasUndone;
   saveStorageData(data);
   renderTrainingArea();
+  // Dispara timer apenas ao MARCAR (não ao desmarcar)
+  if (wasUndone) startRestTimer(75);
 };
 
 window.completeTraining = function() {
